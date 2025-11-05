@@ -1,12 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+// ...existing code...
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { StyleSheet } from 'react-native';
+import { Login, Map, Register, Home, DocumentNotice } from './src/screens';
+import { UserProvider } from './src/userContext';
+import { navigationRef } from './src/navigation';
+import { getAuth, setPersistence, browserLocalPersistence, onAuthStateChanged } from "firebase/auth";
+import { useNavigation } from '@react-navigation/native';
+import { app } from './firebaseConfig';
+const Stack = createNativeStackNavigator();
 
 export default function App() {
+
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+
+    <NavigationContainer ref={navigationRef}>
+      <UserProvider>
+        <Stack.Navigator initialRouteName="Map">
+          <Stack.Screen name="Map" component={Map} options={{
+            title: 'Selecciona la comisaría',
+          }} />
+          <Stack.Screen name="Login" component={Login} options={{
+            headerBackVisible: false,
+            gestureEnabled: false,
+          }} />
+          <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="Home" component={Home} options={{
+            headerBackVisible: false,
+            gestureEnabled: false,
+          }} />
+          <Stack.Screen name="DocumentNotice" component={DocumentNotice} />
+        </Stack.Navigator>
+      </UserProvider>
+    </NavigationContainer>
   );
 }
 
