@@ -30,11 +30,6 @@ export class GeoApi {
                     }
                 }
             }
-            console.log('Bounds:', bounds);
-            console.log('Center:', center);
-            console.log('Matching Docs:', matchingDocs);
-
-
             return matchingDocs as Cuarteles[];
         } catch (error) {
             console.error('Error fetching police stations:', error);
