@@ -4,7 +4,6 @@ import { Register } from './register';
 import * as React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator<AuthStackParamList>();
-
 export const Auth = () => {
 
 
@@ -15,7 +14,9 @@ export const Auth = () => {
           headerBackVisible: false,
           gestureEnabled: false,
         }} />
-        <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="Register" component={Register} options={{
+            headerShown: false,
+          }}/>
       </Stack.Navigator>
   );
 }

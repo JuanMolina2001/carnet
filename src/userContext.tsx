@@ -19,7 +19,7 @@ export const UserProvider = ({ children }: { children?: React.ReactNode }) => {
                 navigation.navigate('Home' as never);
                 setUser(user);
             } else {
-                navigation.navigate('Login' as never);
+                navigation.navigate('Auth' as never);
                 setUser(null);
             }
         });
