@@ -4,27 +4,24 @@ import { TextInput, Button} from 'react-native-paper';
 import { formatRut } from 'rutlib'
 import { validateCredentials } from './validations';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RegisterContext } from './context';
+import { RegisterContext } from '../context';
 
 type Props = NativeStackScreenProps<RegisterStackParamList, 'Step1'>;
 export const Step1 = ({ navigation }: Props) => {
     const {
-        rut,
-        setRut,
-        name,
-        setName,
-        lastName,
-        setLastName
+     userData,
+        setUserData
     } = React.useContext(RegisterContext);
     
     return (
         <View style={styles.container}>
-            <TextInput label="Nombres" style={styles.input} value={name} onChangeText={setName} />
-            <TextInput label="Apellidos" style={styles.input} value={lastName} onChangeText={setLastName} />
-            <TextInput label="RUT" style={styles.input} value={rut} onChangeText={(t) => { setRut(formatRut(t)) }} />
+            <TextInput label="Nombres" style={styles.input} value={userData.name} onChangeText={(text) => setUserData({ ...userData, name: text })} />
+            <TextInput label="Apellidos" style={styles.input} value={userData.lastName} onChangeText={(text) => setUserData({ ...userData, lastName: text })} />
+            <TextInput label="RUT" style={styles.input} value={userData.rut} onChangeText={(text) => setUserData({ ...userData, rut: formatRut(text) })} />
             <Button mode="contained" onPress={() => {
                 try {
-                    validateCredentials({ rut, name, lastName});
+                    validateCredentials(userData, 1);
+                    navigation.navigate('Step2');
                 } catch (error: unknown) {
                     if (error instanceof Error) {
                         ToastAndroid.show(error.message || "Error en la validación", ToastAndroid.LONG);
@@ -35,9 +32,6 @@ export const Step1 = ({ navigation }: Props) => {
                 }
 
             }}>Continuar</Button>
-            <Button mode="text" onPress={() => {
-                navigation.navigate('Step2');
-            }}>Ya tengo una cuenta</Button>
         </View>
     )
 }

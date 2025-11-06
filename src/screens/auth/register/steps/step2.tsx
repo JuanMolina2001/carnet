@@ -1,29 +1,23 @@
 import React from 'react'
-import { View, StyleSheet, ToastAndroid} from 'react-native'
-import { TextInput, Button} from 'react-native-paper';
+import { View, StyleSheet, ToastAndroid } from 'react-native'
+import { TextInput, Button } from 'react-native-paper';
 import { validateCredentials } from './validations';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RegisterContext } from './context';
+import { RegisterContext } from '../context';
 
 type Props = NativeStackScreenProps<RegisterStackParamList, 'Step2'>;
 export const Step2 = ({ navigation }: Props) => {
-    const {
-        email,
-        setEmail,
-        password,
-        setPassword,
-        confirmPassword,
-        setConfirmPassword,
-    } = React.useContext(RegisterContext);
-  
+    const { userData, setUserData } = React.useContext(RegisterContext);
+
     return (
         <View style={styles.container}>
-            <TextInput label="Email" style={styles.input} value={email} onChangeText={setEmail} />
-            <TextInput label="Contraseña" style={styles.input} value={password} onChangeText={setPassword} secureTextEntry />
-            <TextInput label="Confirmar Contraseña" style={styles.input} value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry />
+            <TextInput label="Email" style={styles.input} value={userData.email} onChangeText={(text) => setUserData({ ...userData, email: text })} />
+            <TextInput label="Contraseña" style={styles.input} value={userData.password} onChangeText={(text) => setUserData({ ...userData, password: text })} secureTextEntry />
+            <TextInput label="Confirmar Contraseña" style={styles.input} value={userData.confirmPassword} onChangeText={(text) => setUserData({ ...userData, confirmPassword: text })} secureTextEntry />
             <Button mode="contained" onPress={() => {
                 try {
-                    validateCredentials({email, password,  confirmPassword});
+                    validateCredentials(userData, 2);
+                    navigation.navigate('Biometrics');
                 } catch (error: unknown) {
                     if (error instanceof Error) {
                         ToastAndroid.show(error.message || "Error en la validación", ToastAndroid.LONG);
@@ -34,9 +28,7 @@ export const Step2 = ({ navigation }: Props) => {
                 }
 
             }}>Continuar</Button>
-            <Button mode="text" onPress={() => {
-                navigation.navigate('Biometrics');
-            }}>Ya tengo una cuenta</Button>
+
         </View>
     )
 }
