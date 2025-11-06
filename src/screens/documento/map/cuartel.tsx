@@ -2,7 +2,14 @@ import React from 'react'
 import { Image, View } from 'react-native';
 import { Marker } from 'react-native-maps';
 import { DocContext } from '../Context';
-export const Cuartel: React.FC<{ comisaria: Cuartel }> = ({ comisaria}) => {
+import { LocationObject } from 'expo-location';
+export const Cuartel: React.FC<{ comisaria: Cuartel, location :LocationObject | null }> = ({ comisaria, location }) => {
+    if (!location) {
+        return null;
+    }
+    if (Math.abs(location.coords.latitude - comisaria.latitude) > 0.5 || Math.abs(location.coords.longitude - comisaria.longitude) > 0.5) {
+        return null;
+    }
     const {setCuartel}= React.useContext(DocContext)
     return (
 
@@ -11,7 +18,7 @@ export const Cuartel: React.FC<{ comisaria: Cuartel }> = ({ comisaria}) => {
                 latitude: comisaria.latitude,
                 longitude: comisaria.longitude,
             }}
-            title={comisaria.unidad_nombre}
+            title={comisaria.nombre}
             onPress={() => {
                 setCuartel(comisaria)
             }}

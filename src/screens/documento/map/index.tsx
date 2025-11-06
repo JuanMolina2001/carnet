@@ -3,14 +3,13 @@ import MapView, { Marker } from 'react-native-maps';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import * as Location from 'expo-location';
 import { ToastAndroid } from 'react-native';
-import { GeoApi } from './geoApi';
+import cuarteles  from '../../../../assets/data/cuarteles.min.json';
 import { Button } from 'react-native-paper';
 import { DocContext } from '../Context';
 import { Cuartel } from './cuartel';
 export const Map = () => {
     const {cuartel,setCuartel} = React.useContext(DocContext)
     const [currentLocation, setCurrentLocation] = React.useState<Location.LocationObject | null>(null);
-    const [comisarias, setComisarias] = React.useState<Cuartel[]>([]);
 
     React.useEffect(() => {
         (async () => {
@@ -22,10 +21,6 @@ export const Map = () => {
             }
             const location = await Location.getCurrentPositionAsync({});
             setCurrentLocation(location);
-            const geoApi = new GeoApi();
-            const comisarias = await geoApi.getNearbyPoliceStations(location.coords.latitude, location.coords.longitude);
-            console.log(comisarias);
-            setComisarias(comisarias);
         })();
     }, []);
     return (
@@ -53,8 +48,8 @@ export const Map = () => {
                     longitudeDelta: 0.0421,
 
                 }}>
-                {comisarias.map((comisaria, index) => (
-                    <Cuartel comisaria={comisaria} key={index}/>
+                {(cuarteles as Cuartel[]).map((c, index) => (
+                    <Cuartel location={currentLocation} comisaria={c} key={index}/>
                 ))}
             </MapView>
             <View style={{ position: 'absolute', bottom: 40, left: 0, right: 0, alignItems: 'center' ,display:cuartel?'flex':'none',width:'100%',backgroundColor:'white',padding:16}}>
