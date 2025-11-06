@@ -22,3 +22,8 @@ type DocumentStackParamList =  {
   TypeDoc: undefined;
   Map: undefined;
 };
+type RegisterStackParamList =  {
+  Step1: undefined;
+  Step2: undefined;
+  Biometrics: undefined;
+};
