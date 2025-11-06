@@ -1,6 +1,6 @@
 import { geohashQueryBounds, Geopoint ,distanceBetween} from 'geofire-common';
 import { collection, query, orderBy, startAt, endAt, getDocs } from 'firebase/firestore';
-import { db } from '../../../firebaseConfig';
+import { getDb } from '../../../firebaseConfig';
 export class GeoApi {
     async getNearbyPoliceStations(lat: number, lon: number): Promise<Cuarteles[]> {
         try {
@@ -8,6 +8,7 @@ export class GeoApi {
             const radiusInKm = 10 * 1000;
             const bounds = geohashQueryBounds(center, radiusInKm);
             const promises = [];
+            const db = getDb();
             for (const b of bounds) {
                 const q = query(
                     collection(db as any, "cuarteles"),
