@@ -1,5 +1,20 @@
 import { validateRut } from 'rutlib';
-export function validateCredentials(email: string, password: string, rut: string, name: string, lastName: string, confirmPassword: string): void {
+export function validateCredentials({
+    email,
+    password,
+    rut,
+    name,
+    lastName,
+    confirmPassword
+}:
+    {
+        email?: string,
+        password?: string,
+        rut?: string,
+        name?: string,
+        lastName?: string,
+        confirmPassword?: string
+    }): void {
     if (password !== confirmPassword) {
         throw new Error("Las contraseñas no coinciden");
     }
