@@ -1,17 +1,15 @@
-const { readFile, utils } = require('xlsx');
 const { v4: uuidv4 } = require('uuid');
-const admin = require("firebase-admin");
-const serviceAccount = require("./carnet-15285-firebase-adminsdk-fbsvc-070b924974.json");
+// Dependencias
+const { readFile, utils } = require('xlsx');
+const fs = require('fs');
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+// Leer el archivo ODS
+const police = readFile('./assets/data/layer_cuarteles_20220309024623.ods');
 
-const police = readFile('./assets/layer_cuarteles_20220309024623.ods');
-const db = admin.firestore();
-
+// Convertir la primera hoja a JSON
 const data = utils.sheet_to_json(police.Sheets[police.SheetNames[0]]);
 
+// Mapeo de nombres de columnas
 const keyMap = {
   "NOMBRE_REG,C,254": "region",
   "NOMBRE_UNI,C,254": "unidad_nombre",
@@ -22,46 +20,34 @@ const keyMap = {
   "POINT_Y,N,32,10": "latitude",
   "HECHO,C,50": "ano"
 };
-const geofire = require('geofire-common');
-const renamed = data.map(row => {
-  const out = {};
-  for (const [k, v] of Object.entries(row)) {
-    const newKey = keyMap[k] || k;
-    out[newKey] = v;
-  }
 
-  const lat = parseFloat(out.latitude);
-  const lon = parseFloat(out.longitude);
-
-  if (!isNaN(lat) && !isNaN(lon)) {
-    const hash = geofire.geohashForLocation([lat, lon]);
-    out.geohash = hash;
-    out.coordinates = new admin.firestore.GeoPoint(lat, lon);
-  }
-
-  return out;
-});
-
-(async () => {
-  try {
-    console.log(`Cargando ${renamed.length} registros...`);
-
-    const chunkSize = 500;
-    for (let i = 0; i < renamed.length; i += chunkSize) {
-      const batch = db.batch();
-      const chunk = renamed.slice(i, i + chunkSize);
-
-      chunk.forEach(item => {
-        const ref = db.collection('cuarteles').doc(uuidv4());
-        batch.set(ref, item);
-      });
-
-      await batch.commit();
-      console.log(`Subido lote ${i / chunkSize + 1} (${chunk.length} documentos)`);
+// Procesar y limpiar los datos
+const cleaned = data
+  .map(row => {
+    const out = {};
+    for (const [k, v] of Object.entries(row)) {
+      const newKey = keyMap[k] || k;
+      out[newKey] = v;
     }
 
-    console.log('✅ Todos los datos fueron subidos correctamente.');
-  } catch (err) {
-    console.error('❌ Error subiendo datos:', err);
-  }
-})();
+    const lat = parseFloat(out.latitude);
+    const lon = parseFloat(out.longitude);
+
+    if (isNaN(lat) || isNaN(lon)) return null; // descartar filas sin coordenadas
+
+    return {
+      id: uuidv4(),
+      region: out.region,
+      nombre: out.unidad_nombre ,
+      tipo_unidad: out.tipo_unidad || '',
+      latitude: lat,
+      longitude: lon,
+      ano: out.ano || ''
+    };
+  })
+  .filter(Boolean); // elimina nulls
+
+// Guardar el resultado como JSON
+fs.writeFileSync('./assets/data/cuarteles.min.json', JSON.stringify(cleaned), 'utf-8');
+
+console.log(`✅ Archivo cuarteles.json generado correctamente (${cleaned.length} registros).`);
