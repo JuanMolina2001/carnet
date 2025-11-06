@@ -2,7 +2,7 @@ import React from 'react'
 import { View } from 'react-native'
 import { Button, List } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { DocContext } from '../docContext';
+import { DocContext } from '../Context';
 
 type Props = NativeStackScreenProps<DocumentStackParamList, 'TypeDoc'>;
 export const TypeDoc = ({ navigation }: Props) => {

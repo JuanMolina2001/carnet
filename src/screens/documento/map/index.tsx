@@ -5,13 +5,12 @@ import * as Location from 'expo-location';
 import { ToastAndroid } from 'react-native';
 import { GeoApi } from './geoApi';
 import { Button } from 'react-native-paper';
-import { DocContext } from '../docContext';
-
+import { DocContext } from '../Context';
+import { Cuartel } from './cuartel';
 export const Map = () => {
-    const {} = React.useContext(DocContext)
+    const {cuartel,setCuartel} = React.useContext(DocContext)
     const [currentLocation, setCurrentLocation] = React.useState<Location.LocationObject | null>(null);
     const [comisarias, setComisarias] = React.useState<Cuartel[]>([]);
-    const [display, setDisplay] = React.useState<'none' | 'flex'>('none');
 
     React.useEffect(() => {
         (async () => {
@@ -55,30 +54,12 @@ export const Map = () => {
 
                 }}>
                 {comisarias.map((comisaria, index) => (
-                    <Marker
-                        key={index}
-                        coordinate={{
-                            latitude: comisaria.latitude,
-                            longitude: comisaria.longitude,
-                        }}
-                        title={comisaria.unidad_nombre}
-                        onPress={() => {
-                            setDisplay('flex');
-                        }}
-                    >
-                        <View style={{ alignItems: 'center' }}>
-                            <Image
-                                source={require('../../../../assets/police.png')}
-                                style={{ width: 40, height: 40 }}  
-                                resizeMode="contain"
-                            />
-                        </View>
-                    </Marker>
+                    <Cuartel comisaria={comisaria} key={index}/>
                 ))}
             </MapView>
-            <View style={{ position: 'absolute', bottom: 40, left: 0, right: 0, alignItems: 'center' ,display:display,width:'100%',backgroundColor:'white',padding:16}}>
+            <View style={{ position: 'absolute', bottom: 40, left: 0, right: 0, alignItems: 'center' ,display:cuartel?'flex':'none',width:'100%',backgroundColor:'white',padding:16}}>
                 <Button mode="contained" onPress={() => {}}>Continuar</Button>
-                <Button mode="text" onPress={() => { setDisplay('none'); }}>Cancelar</Button>
+                <Button mode="text" onPress={() => { setCuartel(null); }}>Cancelar</Button>
             </View>
         </View>
     );
