@@ -3,10 +3,10 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet } from 'react-native';
-import { Map, Home, DocumentNotice, Auth } from './src/screens';
+import {  Home, DocumentNotice, Auth } from './src/screens';
 import { UserProvider } from './src/userContext';
 import { navigationRef } from './src/navigation';
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
 
@@ -16,9 +16,6 @@ export default function App() {
     <NavigationContainer ref={navigationRef}>
       <UserProvider>
         <Stack.Navigator initialRouteName="Auth">
-          <Stack.Screen name="Map" component={Map} options={{
-            title: 'Selecciona la comisaría',
-          }} />
           <Stack.Screen name="Auth" component={Auth} options={{
             headerShown: false,
             
@@ -27,7 +24,10 @@ export default function App() {
             headerBackVisible: false,
             gestureEnabled: false,
           }} />
-          <Stack.Screen name="DocumentNotice" component={DocumentNotice} />
+          <Stack.Screen name="Document" component={DocumentNotice}  options={{
+            headerShown: false,
+            
+          }} />
         </Stack.Navigator>
       </UserProvider>
     </NavigationContainer>

@@ -1,15 +1,15 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 import { Button } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-export const Home = () => {
-  const navigation = useNavigation();
 
+type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+export const Home = ({ route, navigation }: Props) => {
   return (
     <View>
         <Text>Home Screen</Text>
-        <Button mode="contained" onPress={() => navigation.navigate('DocumentNotice' as never)}>Publicar Documento</Button>
+        <Button mode="contained" onPress={() => navigation.navigate('Document')}>Publicar Documento</Button>
     </View>
   )
 }

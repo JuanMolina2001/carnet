@@ -1,18 +1,20 @@
 import React from 'react'
 import { Text, View, StyleSheet, ToastAndroid } from 'react-native'
-import { app } from '../../../firebaseConfig';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from '../../../firebaseConfig';
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { TextInput, Button, HelperText } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../../userContext';
-export const Login = () => {
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+
+type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
+export const Login = ({ navigation }: Props) => {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [passwordVisible, setPasswordVisible] = React.useState(false);
-    const navigation = useNavigation();
     const { user, setUser } = React.useContext(UserContext);
     const handleLogin = () => {
-        const auth = getAuth(app);
+
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
@@ -35,7 +37,7 @@ export const Login = () => {
                 style={styles.input} value={password} onChangeText={setPassword} />
             <Button mode="contained" onPress={handleLogin}>Iniciar Sesión</Button>
             <Button mode="text" onPress={() => {
-                navigation.navigate('Register' as never);
+                navigation.navigate('Register');
 
             }}>Registrarse</Button>
         </View>

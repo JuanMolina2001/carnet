@@ -1,14 +1,17 @@
 import React from 'react'
 import { Text, View, StyleSheet, ToastAndroid, KeyboardAvoidingView, Platform } from 'react-native'
-import { app } from '../../../../firebaseConfig';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from '../../../../firebaseConfig';
+import {  signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { TextInput, Button, HelperText } from 'react-native-paper';
 import Biometric from './biometric';
 import { formatRut } from 'rutlib'
 import { UserContext } from '../../../userContext';
-import { useNavigation } from '@react-navigation/native';
 import { validateCredentials } from './validations';
-export const Register = () => {
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+
+type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
+export const Register = ({ navigation }: Props) => {
     const [name, setName] = React.useState('');
     const [lastName, setLastName] = React.useState('');
     const [email, setEmail] = React.useState('');
@@ -16,17 +19,12 @@ export const Register = () => {
     const [confirmPassword, setConfirmPassword] = React.useState('');
     const [rut, setRut] = React.useState('');
     const [steps, setSteps] = React.useState(0);
-    const { setUser } = React.useContext(UserContext);
-    const navigation = useNavigation();
     const handleLogin = () => {
-        const auth = getAuth(app);
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 // Signed in
                 const user = userCredential.user;
-                console.log('User registered:', user);
                 ToastAndroid.show("Usuario registrado exitosamente", ToastAndroid.LONG);
-                setUser(user);
             })
             .catch((error) => {
                 const errorCode = error.code;
@@ -63,7 +61,7 @@ export const Register = () => {
                 setSteps(1);
             }}>Continuar</Button>
             <Button mode="text" onPress={() => {
-                navigation.navigate('Login' as never);
+                navigation.navigate('Login');
             }}>Ya tengo una cuenta</Button>
         </View>
     )
