@@ -22,6 +22,7 @@ export const Map = () => {
             setLocation(location);
             const geoApi = new GeoApi();
             const comisarias = await geoApi.getNearbyPoliceStations(location.coords.latitude, location.coords.longitude);
+            console.log(comisarias);
             setComisarias(comisarias);
         })();
     }, []);

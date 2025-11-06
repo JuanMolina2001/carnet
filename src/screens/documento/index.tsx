@@ -4,7 +4,6 @@ import { Button, List } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 export const DocumentNotice = () => {
     const [typeDocument, setTypeDocument] = React.useState('');
-    const [steps, setSteps] = React.useState(0);
     const navigation = useNavigation();
     const [expanded, setExpanded] = React.useState(false);
     return (
