@@ -20,12 +20,8 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID
 };
 
-let db : ReturnType<typeof getFirestore>;
 
-export const getDb = () => {
-  if (!db) db = getFirestore(app);
-  return db;
-};
+
 export const app = initializeApp(firebaseConfig);
 export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage)
