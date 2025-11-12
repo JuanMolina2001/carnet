@@ -1,3 +1,3 @@
 export * from './auth';
-export * from './documento';
+export * from './LostItemForm';
 export * from './home';
