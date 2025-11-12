@@ -7,7 +7,7 @@ export const Cuartel: React.FC<{ comisaria: Cuartel, location :LocationObject | 
     if (!location) {
         return null;
     }
-    if (Math.abs(location.coords.latitude - comisaria.latitude) > 0.5 || Math.abs(location.coords.longitude - comisaria.longitude) > 0.5) {
+    if (Math.abs(location.coords.latitude - comisaria.latitude) > 0.2 || Math.abs(location.coords.longitude - comisaria.longitude) > 0.2) {
         return null;
     }
     const {setCuartel}= React.useContext(DocContext)

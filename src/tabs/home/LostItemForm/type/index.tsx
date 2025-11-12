@@ -2,11 +2,12 @@ import React from 'react'
 import { View } from 'react-native'
 import { Button, List } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { DocContext } from '../Context';
+import { LostDocContext } from '@/context/LostDocContext';
+
 
 type Props = NativeStackScreenProps<DocumentStackParamList, 'TypeDoc'>;
 export const TypeDoc = ({ navigation }: Props) => {
-    const { typeDocument, setTypeDocument } = React.useContext(DocContext);
+    const { typeDocument, setTypeDocument } = React.useContext(LostDocContext);
     const [expanded, setExpanded] = React.useState(false);
     return (
         <View>

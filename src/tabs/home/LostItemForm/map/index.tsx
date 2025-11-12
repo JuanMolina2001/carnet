@@ -5,10 +5,16 @@ import * as Location from 'expo-location';
 import { ToastAndroid } from 'react-native';
 import cuarteles  from '../../../../assets/data/cuarteles.min.json';
 import { Button } from 'react-native-paper';
-import { DocContext } from '../Context';
 import { Cuartel } from './cuartel';
-export const Map = () => {
-    const {cuartel,setCuartel} = React.useContext(DocContext)
+import { LostDocContext } from '@/context/LostDocContext';
+
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+type Props = NativeStackScreenProps<DocumentStackParamList, 'Map'>;
+
+export const Map = ({ navigation }: Props) => {
+
+
+    const {cuartel,setCuartel} = React.useContext(LostDocContext)
     const [currentLocation, setCurrentLocation] = React.useState<Location.LocationObject | null>(null);
 
     React.useEffect(() => {
@@ -53,7 +59,9 @@ export const Map = () => {
                 ))}
             </MapView>
             <View style={{ position: 'absolute', bottom: 40, left: 0, right: 0, alignItems: 'center' ,display:cuartel?'flex':'none',width:'100%',backgroundColor:'white',padding:16}}>
-                <Button mode="contained" onPress={() => {}}>Continuar</Button>
+                <Button mode="contained" onPress={() => {
+                    navigation.navigate('Confirm');
+                }}>Continuar</Button>
                 <Button mode="text" onPress={() => { setCuartel(null); }}>Cancelar</Button>
             </View>
         </View>
