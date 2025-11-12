@@ -3,7 +3,7 @@ import React from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { User } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
-import {auth} from '../firebaseConfig'
+import { auth } from '@/config/firebase';
 export const UserContext = React.createContext({
     user: null as User | null,
     setUser: (user: User | null) => { },
@@ -17,6 +17,10 @@ export const UserProvider = ({ children }: { children?: React.ReactNode }) => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 navigation.navigate('Home' as never);
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Home' as never }],
+                });
                 setUser(user);
             } else {
                 navigation.navigate('Auth' as never);

@@ -1,6 +1,6 @@
 // ...existing code...
 import React from "react";
-export const DocContext = React.createContext({
+export const LostDocContext = React.createContext({
     typeDocument: '',
     setTypeDocument: (type: string) => { },
     cuartel: null as Cuartel | null,
