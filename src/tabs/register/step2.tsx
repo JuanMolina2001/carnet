@@ -3,7 +3,8 @@ import { View, StyleSheet, ToastAndroid } from 'react-native'
 import { TextInput, Button } from 'react-native-paper';
 import { validateCredentials } from './validations';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RegisterContext } from '../context';
+import { RegisterContext } from '@/context/register'
+
 
 type Props = NativeStackScreenProps<RegisterStackParamList, 'Step2'>;
 export const Step2 = ({ navigation }: Props) => {

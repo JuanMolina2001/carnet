@@ -4,7 +4,8 @@ import { TextInput, Button} from 'react-native-paper';
 import { formatRut } from 'rutlib'
 import { validateCredentials } from './validations';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RegisterContext } from '../context';
+import { RegisterContext } from '@/context/register'
+
 
 type Props = NativeStackScreenProps<RegisterStackParamList, 'Step1'>;
 export const Step1 = ({ navigation }: Props) => {

@@ -1,9 +1,9 @@
 import React from 'react'
-import { RegisterContext } from './context'
+import { RegisterContext } from '@/context/register'
 import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Step1, Biometric, Step2 } from './steps';
+import { Step1, Biometric, Step2 } from '@/tabs/register';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from 'firebaseConfig';
+import { auth } from '@/config/firebase';
 import { ToastAndroid, View } from 'react-native';
 import { Button } from 'react-native-paper';
 const Stack = createNativeStackNavigator<RegisterStackParamList>();
@@ -43,7 +43,7 @@ export const Register = ({ navigation }: Props) => {
         }}>
             <View style={{ flex: 1, justifyContent: 'space-between' }}>
                 <View style={{ flex: 1 }}>
-                    <Stack.Navigator initialRouteName="Step1">
+                    <Stack.Navigator initialRouteName="Biometrics">
                         <Stack.Screen name="Step1" component={Step1} options={options} />
                         <Stack.Screen name="Step2" component={Step2} options={options} />
                         <Stack.Screen name="Biometrics" component={Biometric} options={options} />
