@@ -2,7 +2,7 @@ import React from 'react'
 import { View } from 'react-native'
 import { Button, List } from 'react-native-paper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { LostDocContext } from '@/context/LostDocContext';
+import { LostDocContext } from '@/context/LostDoc';
 
 
 type Props = NativeStackScreenProps<DocumentStackParamList, 'TypeDoc'>;

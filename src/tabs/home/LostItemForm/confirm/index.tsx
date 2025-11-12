@@ -2,11 +2,11 @@ import React from 'react'
 import { View, StyleSheet } from 'react-native'
 import { Carnet } from './carnet';
 import { Tne } from './tne'
-import { LostDocContext} from '@/context/LostDocContext';
+import { LostDocContext} from '@/context/LostDoc';
 import { v4 as uuid } from 'uuid';
 import { db } from "@/config/firebase";
 import { doc, setDoc } from "firebase/firestore";
-import { UserContext } from '@/context/userContext';
+import { UserContext } from '@/context/user';
 
 
 export const Confirm = () => {

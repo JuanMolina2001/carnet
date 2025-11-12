@@ -3,7 +3,7 @@ import { Map } from './map';
 import { Confirm } from './confirm';
 import * as React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { LostDocContext } from '@/context/LostDocContext';
+import { LostDocContext } from '@/context/LostDoc';
 const Stack = createNativeStackNavigator<DocumentStackParamList>();
 
 export const LostItemForm = () => {

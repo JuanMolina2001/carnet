@@ -1,8 +1,8 @@
 import React from 'react'
 import { View } from 'react-native'
-import { db } from 'firebaseConfig';
+import { db } from '@/config/firebase';
 import { collection, getDocs } from 'firebase/firestore';
-import { UserContext } from '@/userContext';
+import { UserContext } from '@/context/user';
 import { Text } from 'react-native-paper';
 export const MyDocs = () => {
     const { user } = React.useContext(UserContext);

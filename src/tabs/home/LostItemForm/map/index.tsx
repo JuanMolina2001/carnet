@@ -6,7 +6,7 @@ import { ToastAndroid } from 'react-native';
 import cuarteles  from '../../../../assets/data/cuarteles.min.json';
 import { Button } from 'react-native-paper';
 import { Cuartel } from './cuartel';
-import { LostDocContext } from '@/context/LostDocContext';
+import { LostDocContext } from '@/context/LostDoc';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 type Props = NativeStackScreenProps<DocumentStackParamList, 'Map'>;
