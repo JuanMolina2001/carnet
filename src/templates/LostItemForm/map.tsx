@@ -3,9 +3,9 @@ import MapView, { Marker } from 'react-native-maps';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import * as Location from 'expo-location';
 import { ToastAndroid } from 'react-native';
-import cuarteles  from '../../../../assets/data/cuarteles.min.json';
+import cuarteles  from '@/data/cuarteles.min.json';
 import { Button } from 'react-native-paper';
-import { Cuartel } from './cuartel';
+import { Cuartel } from '@/components/cuartel';
 import { LostDocContext } from '@/context/LostDoc';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -16,7 +16,6 @@ export const Map = ({ navigation }: Props) => {
 
     const {cuartel,setCuartel} = React.useContext(LostDocContext)
     const [currentLocation, setCurrentLocation] = React.useState<Location.LocationObject | null>(null);
-
     React.useEffect(() => {
         (async () => {
             

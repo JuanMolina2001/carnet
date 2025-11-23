@@ -3,11 +3,13 @@ import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { StyleSheet, View } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import WebView from 'react-native-webview';
+import { LostDocContext } from '@/context/LostDoc';
 export const Carnet = () => {
 
     const [permission, requestPermission] = useCameraPermissions();
     const cameraRef = React.useRef<CameraView>(null);
     const [url, setUrl] = React.useState<string | null>(null);
+    const {addDocument} = React.useContext(LostDocContext);
     const injectedJS = `
 (function () {
   const originalFetch = window.fetch;
@@ -71,6 +73,7 @@ export const Carnet = () => {
                     onMessage={(event) => {
                         const data = JSON.parse(event.nativeEvent.data);
                         console.log("Interceptado:", data);
+                        
                     }}
                 />
             ) : (

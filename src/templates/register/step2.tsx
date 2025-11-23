@@ -1,14 +1,14 @@
 import React from 'react'
 import { View, StyleSheet, ToastAndroid } from 'react-native'
 import { TextInput, Button } from 'react-native-paper';
-import { validateCredentials } from './validations';
+import { validateCredentials } from '@/utils/validations';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RegisterContext } from '@/context/register'
 
 
 type Props = NativeStackScreenProps<RegisterStackParamList, 'Step2'>;
 export const Step2 = ({ navigation }: Props) => {
-    const { userData, setUserData } = React.useContext(RegisterContext);
+    const { userData, setUserData,handleLogin } = React.useContext(RegisterContext);
 
     return (
         <View style={styles.container}>
@@ -18,7 +18,8 @@ export const Step2 = ({ navigation }: Props) => {
             <Button mode="contained" onPress={() => {
                 try {
                     validateCredentials(userData, 2);
-                    navigation.navigate('Biometrics');
+                    handleLogin();
+                    // navigation.navigate('Biometrics');
                 } catch (error: unknown) {
                     if (error instanceof Error) {
                         ToastAndroid.show(error.message || "Error en la validación", ToastAndroid.LONG);

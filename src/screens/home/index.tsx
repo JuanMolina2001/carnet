@@ -1,26 +1,30 @@
-import React from 'react'
-import { Text, View } from 'react-native'
-import { Button, BottomNavigation } from 'react-native-paper';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { LostItemForm,MyDocs } from '@/tabs/home';
-type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
-export const Home = ({ route, navigation }: Props) => {
-  const [routes] = React.useState([
-    { key: 'MyDocs', title: 'Mis documentos', focusedIcon: 'folder' },
-    { key: 'LostItemForm', title: 'Publicar documento', focusedIcon: 'file-document' },
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { LostItemForm } from '@/templates/LostItemForm';
+import { MyDocs } from '@/templates/myDocs';
+import Account from '@/templates/account';
+import { MaterialIcons, MaterialIconsIconName } from '@react-native-vector-icons/material-icons';
 
-  ]);
-  const [index, setIndex] = React.useState(0);
-  const renderScene = BottomNavigation.SceneMap({
-    LostItemForm: LostItemForm,
-    MyDocs: () => <View><Text>Mis Documentos</Text></View>,
+const Tab = createBottomTabNavigator();
 
-  });
+export const Home = () => {
   return (
-      <BottomNavigation
-        navigationState={{ index, routes }}
-        onIndexChange={setIndex}
-        renderScene={renderScene}
-      />
-  )
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ color, size }) => {
+          let icon : MaterialIconsIconName = 'help-center';
+
+          if (route.name === 'MyDocs') icon = 'folder';
+          if (route.name === 'LostItemForm') icon = 'document-scanner';
+          if (route.name === 'Profile') icon = 'account-circle';
+
+          return <MaterialIcons name={icon} size={size} color={color} />;
+        }
+      })}
+    >
+      <Tab.Screen name="MyDocs" component={MyDocs} options={{ title: 'Mis documentos' }} />
+      <Tab.Screen name="LostItemForm" component={LostItemForm} options={{ title: 'Publicar' }} />
+      <Tab.Screen name="Profile" component={Account} options={{ title: 'Perfil' }} />
+    </Tab.Navigator>
+  );
 }

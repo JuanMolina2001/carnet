@@ -2,7 +2,7 @@ import React from 'react'
 import { Text, View, StyleSheet, ToastAndroid, KeyboardAvoidingView, Platform } from 'react-native'
 import { TextInput, Button} from 'react-native-paper';
 import { formatRut } from 'rutlib'
-import { validateCredentials } from './validations';
+import { validateCredentials } from '@/utils/validations';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RegisterContext } from '@/context/register'
 
