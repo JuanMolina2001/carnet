@@ -234,24 +234,24 @@ export const baasAdapter = {
                 status: 'En tramite',
             } as Partial<LostDocument>);
             // registro documentos publicados en usuario actual
-
+            console.log(data.rut)
             await setDoc(doc(db, `users/${data.rut}/published_documents`, id), {
                 owner: data.owner_id,
             });
-            const snap = await getDoc(doc(db, "users", data.owner_id));
-            if (snap.exists()) {
-                await fetch('http://localhost:3000/send-email', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        to: snap.data().email,
-                        Type: data.typeDocument,
-                        date: new Date().toISOString().split('T')[0]
-                    })
-                })
-            }
+            // const snap = await getDoc(doc(db, "users", data.owner_id));
+            // if (snap.exists()) {
+                // await fetch('http://localhost:3000/send-email', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json'
+                //     },
+                //     body: JSON.stringify({
+                //         to: snap.data().email,
+                //         Type: data.typeDocument,
+                //         date: new Date().toISOString().split('T')[0]
+                //     })
+                // })
+            // }
 
         } catch (error) {
             throw error;

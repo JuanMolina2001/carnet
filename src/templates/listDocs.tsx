@@ -164,6 +164,7 @@ export const ListDocs: React.FC<{
                                             label={option}
                                             active={filter === option}
                                             onPress={() => {
+                                                //@ ts-ignore
                                                 setFilter(option as any);
                                                 setPage(0);
                                             }}
