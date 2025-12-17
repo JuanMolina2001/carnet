@@ -6,9 +6,11 @@ export const RegisterContext = createContext<RegisterContextType>({
         confirmPassword: "",
         rut: "",
         name: "",
-        lastName: ""
+        lastName: "",
     },
     setUserData: () => { },
-    handleLogin: () => { }
+    handleLogin: async () => { },
+    setBiometricScreen: (value: boolean) => { }
+
 });
 

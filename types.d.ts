@@ -19,7 +19,36 @@ declare namespace NodeJS {
     EXPO_PUBLIC_GEMINI_API_KEY: string;
   }
 }
-interface Cuartel { id: string; region: string; nombre: string; tipo_unidad: string; latitude: number; longitude: number; ano: string; }
+interface Cuartel {
+  type: string,
+  properties: {
+    id: string,
+
+    info: string,
+    nombre: string,
+    categ: string,
+    tipo: string,
+    emisor: string,
+    admin: string,
+    ambito: string,
+    tema: string,
+    lon: number,
+    lat: number,
+    region: string,
+    cut_reg: string,
+    provincia: string,
+    cut_pro: string,
+    comuna: string,
+    cut_com: string
+  },
+  geometry: {
+    type: string,
+    coordinates: [
+      number,
+      number
+    ]
+  }
+}
 interface UserData {
   email?: string,
   password?: string,
@@ -32,14 +61,19 @@ interface UserData {
 interface RegisterContextType {
   userData: UserData,
   setUserData: (userData: UserData) => void,
-  handleLogin: () => void,
+  handleLogin: () => Promise<void>,
+  setBiometricScreen: (value: boolean) => void,
 }
 
 // Navigation types
 type RootStackParamList = {
   Home: undefined;
   Auth: undefined;
-  Document: undefined;
+  MailConfirm: undefined;
+  TermsNconditions: undefined;
+  Qr: { id_user?: string, expectedStatus: LostDocument['status'], docRef: string };
+  Account: undefined;
+  Map: { cuartel_id: string  | undefined};
 };
 type HomeStackParamList = {
 
@@ -47,22 +81,24 @@ type HomeStackParamList = {
 type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
+  PasswordReset: undefined;
 };
 type DocumentStackParamList = {
   TypeDoc: undefined;
-  Map: undefined;
   Confirm: undefined;
+  ListDocs: undefined;
 };
 type MyDocsStackParamList = {
   ListDocs: undefined;
-  Location: { cuartel_id: string}
+  Doc: { LostDocument: LostDocument };
 };
 type RegisterStackParamList = {
   Step1: undefined;
   Step2: undefined;
-  Biometrics: undefined;
+  Biometric: undefined;
 };
 interface TneData {
+  errors?: [string],
   apellidoMaternoAlumno: string
   apellidoPaternoAlumno: string
   carrera: string
@@ -75,21 +111,31 @@ interface TneData {
   nombreAlumno: string
   region: string
   ultimaTarjeta: {
-        activa: boolean,
-        estado: string,
-        fechaSello: string,
-        folio: string,
+    activa: boolean,
+    estado: string,
+    fechaSello: string,
+    folio: string,
 
-    }
+  }
 }
 
-interface DocData{
+interface LostDocument {
   id: string;
-  comisaria: string;
-  tipo: string;
+  comisaria?: string;
+  tipo: 'Carnet' | 'TNE' ;
   id_user: string;
-  owner_id: string;
   data: any;
   created_at: Date;
-  status: string;
+  status: 'En comisaria' | 'Reclamado' | 'En tramite';
+  path?: string;
+}
+type LoadingIcon = 'Bouncy Mapmaker' | 'Failure error icon' | 'Task complete tick' | 'Searching' | 'Scan'
+type setLoadingParams = {
+  loading: boolean,
+  icon?: LoadingIcon | null,
+  options?: Partial<LottieView['props']>,
+  timeout?: number,
+} | boolean
+interface PublishedDoc extends LostDocument {
+  owner: string;
 }

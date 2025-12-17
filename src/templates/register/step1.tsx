@@ -1,8 +1,7 @@
 import React from 'react'
 import { Text, View, StyleSheet, ToastAndroid, KeyboardAvoidingView, Platform } from 'react-native'
-import { TextInput, Button} from 'react-native-paper';
-import { formatRut } from 'rutlib'
-import { validateCredentials } from '@/utils/validations';
+import { TextInput, Button, HelperText } from 'react-native-paper';
+import { formatRut, validateRut } from 'rutlib'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RegisterContext } from '@/context/register'
 
@@ -10,39 +9,57 @@ import { RegisterContext } from '@/context/register'
 type Props = NativeStackScreenProps<RegisterStackParamList, 'Step1'>;
 export const Step1 = ({ navigation }: Props) => {
     const {
-     userData,
+        userData,
         setUserData
     } = React.useContext(RegisterContext);
-    
+    const { name, lastName, rut } = userData;
+    const [errors, setErrors] = React.useState<{ [key: string]: boolean }>({
+        'name': false,
+        'lastName': false,
+        'rut': false,
+    });
     return (
-        <View style={styles.container}>
-            <TextInput label="Nombres" style={styles.input} value={userData.name} onChangeText={(text) => setUserData({ ...userData, name: text })} />
-            <TextInput label="Apellidos" style={styles.input} value={userData.lastName} onChangeText={(text) => setUserData({ ...userData, lastName: text })} />
-            <TextInput label="RUT" style={styles.input} value={userData.rut} onChangeText={(text) => setUserData({ ...userData, rut: formatRut(text) })} />
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.container}>
+            <TextInput label="Nombres" error={errors.name} style={styles.input} value={userData.name} onChangeText={(text) => setUserData({ ...userData, name: text })} />
+            <HelperText style={{ display: errors.name ? 'flex' : 'none' }} type="error" visible>Por favor ingrese su nombre.</HelperText>
+            <TextInput label="Apellidos" error={errors.lastName} style={styles.input} value={userData.lastName} onChangeText={(text) => setUserData({ ...userData, lastName: text })} />
+            <HelperText style={{ display: errors.lastName ? 'flex' : 'none' }} type="error" visible>Por favor ingrese sus apellidos.</HelperText>
+            <TextInput label="RUT" error={errors.rut} style={styles.input} value={userData.rut} onChangeText={(text) => setUserData({ ...userData, rut: formatRut(text) })} />
+            <HelperText style={{ display: errors.rut ? 'flex' : 'none' }} type="error" visible>Por favor ingrese un RUT válido.</HelperText>
             <Button mode="contained" onPress={() => {
-                try {
-                    validateCredentials(userData, 1);
-                    navigation.navigate('Step2');
-                } catch (error: unknown) {
-                    if (error instanceof Error) {
-                        ToastAndroid.show(error.message || "Error en la validación", ToastAndroid.LONG);
-                    } else {
-                        ToastAndroid.show("Error en la validación", ToastAndroid.LONG);
-                    }
-                    return;
+                let valid = true;
+                const newErrors = { name: false, lastName: false, rut: false };
+
+                if (!name || name.trim().length === 0) {
+                    newErrors.name = true;
+                    valid = false;
                 }
 
+                if (!lastName || lastName.trim().length === 0) {
+                    newErrors.lastName = true;
+                    valid = false;
+                }
+
+                if (!rut || !validateRut(rut)) {
+                    newErrors.rut = true;
+                    valid = false;
+                }
+                setErrors(newErrors);
+                valid && navigation.navigate('Step2');
+
             }}>Continuar</Button>
-        </View>
+        </KeyboardAvoidingView>
     )
 }
 
 
 const styles = StyleSheet.create({
     container: {
-        justifyContent: 'center',
-        flex: 1,
         padding: 16,
+        flex: 1,
+        justifyContent: 'center'
     },
     input: {
         marginBottom: 12,

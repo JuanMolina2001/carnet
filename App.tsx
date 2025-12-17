@@ -3,62 +3,108 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet } from 'react-native';
-import { Home, Auth } from '@/screens';
-import { UserContext } from '@/context/user';
-import { onAuthStateChanged, User } from "firebase/auth";
-import { auth, db } from '@/config/firebase';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { Home, Auth } from '@/routes';
+import { MailConfirm } from '@/screens/mailConfirm';
+import { TermsNconditions } from '@/screens/termsNconditions';
+import { Account } from '@/screens/account';
+import { Qr } from '@/screens/qr';
+import { AppContextProvider } from '@/context/app';
+import { User, baasAdapter } from "@/adapters/baas";
+import * as Notifications from "expo-notifications";
+import { Map } from '@/screens/map';
+import { PaperProvider } from 'react-native-paper';
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+
 export default function App() {
-
   const [user, setUser] = React.useState<User | null>(null);
-  const [rut, setRut] = React.useState<string>('');
-  const [docs, setDocs] = React.useState<DocData[]>([]);
+  const [rut, setRut] = React.useState<string | null>(null);
+  const [docs, setDocs] = React.useState<LostDocument[] | null>(null);
+  const [publishedDocs, setPublishedDocs] = React.useState<PublishedDoc[] | null>(null);
+  const isPolice = !!(user?.email?.split('@')[1] === baasAdapter.domain)
   React.useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (user) {
+    (async () => {
+      console.log(user)
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        alert("Permiso denegado");
 
-        setUser(user);
-        (async () => {
-          if (!rut) {
-            const storedRut = await AsyncStorage.getItem('rut');
-            storedRut && setRut(storedRut);
-
-          } else {
-            AsyncStorage.setItem('rut', rut);
-          }
-          const ref = collection(db, "documents");
-          const q = query(ref, where("owner_id", "==", rut));
-
-          const snapshot = await getDocs(q);
-          const fetchedDocs: DocData[] = [];
-          snapshot.forEach(doc => {
-            fetchedDocs.push({ id: doc.id, ...doc.data() } as DocData);
-          });
-          setDocs(fetchedDocs);
-        })();
-
-      } else {
-        setUser(null);
-        AsyncStorage.removeItem('rut');
       }
-    });
-    return () => unsub();
-  }, [rut]);
-  return (
+    })();
+    if (!rut) return;
+    let allListener = () => { }
+    let unsubscribe1 = () => { };
+    let unsubscribe2 = () => { };
+    if (isPolice) {
+      allListener = baasAdapter.listenerAllDocuments((documents) => {
+        setDocs(documents);
+      })
 
+    } else {
+      unsubscribe2 = baasAdapter.listenerPublished(rut, (documents) => {
+        setPublishedDocs(documents);
+      });
+      unsubscribe1 = baasAdapter.listenerDocuments(rut, (documents) => {
+        setDocs(documents);
+      });
+    }
+
+    return () => {
+      allListener()
+      unsubscribe1();
+      unsubscribe2();
+    }
+  }, [rut]);
+
+  return (
     <NavigationContainer>
-      <UserContext.Provider value={{ user, setUser, rut, setRut, docs, setDocs }}>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen name="Home" component={user ? Home : Auth} options={{
-            headerShown: false,
-            headerBackVisible: false,
-            gestureEnabled: false,
-          }} />
-        </Stack.Navigator>
-      </UserContext.Provider>
+      <PaperProvider>
+        <AppContextProvider values={{
+          user,
+          setRut,
+          setUser,
+          rut,
+          docs,
+          setDocs,
+          publishedDocs,
+          setPublishedDocs,
+          isPolice,
+        }}>
+          <Stack.Navigator initialRouteName="Home">
+            <Stack.Screen name="Home" component={user ? Home : Auth} options={{
+              headerShown: false,
+              headerBackVisible: false,
+              gestureEnabled: false,
+            }} />
+            <Stack.Screen name="MailConfirm" component={MailConfirm} options={{
+              title: "Confirmar correo",
+              headerBackVisible: false,
+            }} />
+            <Stack.Screen name="TermsNconditions" component={TermsNconditions} options={{
+              title: "Términos y condiciones",
+            }} />
+            <Stack.Screen name="Qr" component={Qr} options={{
+              title: "Código QR",
+            }} />
+            <Stack.Screen name="Account" component={Account} options={{
+              title: "Mi cuenta",
+            }} />
+            <Stack.Screen name="Map" component={Map} options={{
+              title: "Mapa de comisarías",
+            }} />
+          </Stack.Navigator>
+        </AppContextProvider>
+      </PaperProvider>
     </NavigationContainer>
   );
 }

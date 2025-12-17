@@ -1,34 +1,40 @@
 import React from 'react'
 import { StyleSheet, ToastAndroid, View, Alert } from 'react-native';
-import { TextInput, Button } from 'react-native-paper';
+import { TextInput, Button, ProgressBar } from 'react-native-paper';
 import { formatRut, validateRut } from 'rutlib'
 import { LostDocContext } from '@/context/LostDoc';
 import * as Crypto from 'expo-crypto';
-import { documentExist } from '@/utils/LostItemForm'
-import { useNavigation } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { baasAdapter } from '@/adapters/baas';
+import { AppContext } from '@/context/app';
+type Props = NativeStackScreenProps<DocumentStackParamList, 'Confirm'>;
 
-
-
-export const Tne = () => {
-    const { addDocument } = React.useContext(LostDocContext);
-    const [rut, setRut] = React.useState('');
+export const Tne = ({ navigation }: Props) => {
+    const { typeDocument,setProg } = React.useContext(LostDocContext);
+    const [OwnerRut, setOwnerRut] = React.useState('');
     const [folio, setFolio] = React.useState('');
-    const navigation = useNavigation();
-
+    const { user, rut } = React.useContext(AppContext);
+    React.useEffect(() => {
+        setProg(0.9);
+        return () => {
+            setProg(0.3);
+        }
+    }, []);
     return (
         <View style={styles.container}>
-            <TextInput label="" style={styles.input} value={rut} onChangeText={(e) => {
-                setRut(formatRut(e))
+            <TextInput label="Rut" style={styles.input} value={OwnerRut} onChangeText={(e) => {
+                setOwnerRut(formatRut(e))
             }} />
-            <TextInput label=""  style={styles.input} value={folio} onChangeText={(e) => {
+            <TextInput label="Folio" style={styles.input} value={folio} onChangeText={(e) => {
                 setFolio(e)
             }} />
             <Button mode="contained" onPress={() => {
-                if (!rut || !validateRut(rut) || !folio) {
+                if (!rut) return
+                if (!OwnerRut || !validateRut(OwnerRut) || !folio) {
                     ToastAndroid.show("Debe ingresar un RUT valido y un folio", ToastAndroid.LONG);
                     return;
                 }
-                const [number, _] = rut.replaceAll('.', '').split('-');
+                const [number, _] = OwnerRut.replaceAll('.', '').split('-');
                 fetch(`https://estadotne.cl/api-junaebqa/gateway/v1/busqueda-estado-tne/publico?run=${number}`)
                     .then(r => r.json())
                     .then((data: TneData) => new Promise<{
@@ -37,12 +43,16 @@ export const Tne = () => {
                     }>(async (resolve, reject) => {
                         const owner_id = await Crypto.digestStringAsync(
                             Crypto.CryptoDigestAlgorithm.SHA256,
-                            formatRut(rut)
+                            formatRut(OwnerRut)
                         );
-                        const exists = await documentExist('TNE', owner_id);
+
+                        const exists = await baasAdapter.documentExist('TNE', owner_id);
+                        if (data.errors) {
+                            reject("No se encontró una TNE con el RUT ingresado");
+                            return;
+                        }
                         if (exists) {
-                            ToastAndroid.show("Ya existe una TNE registrada con este RUT", ToastAndroid.LONG);
-                            reject();
+                            reject("Ya existe una TNE registrada con este RUT");
                             return;
                         }
                         if (!data.ultimaTarjeta.folio) {
@@ -61,15 +71,14 @@ export const Tne = () => {
                             return;
                         }
                         if (data.ultimaTarjeta.folio !== folio) {
-                            ToastAndroid.show("El folio de la TNE no coincide con el ingresado", ToastAndroid.LONG);
-                            reject();
+                            reject("El folio de la TNE no coincide con el ingresado");
                             return;
                         }
                         resolve({ data, owner_id, })
                     })
 
                     ).then(({ data, owner_id }) => {
-                        addDocument({
+                        baasAdapter.addDocument({
                             owner_id,
                             data: {
                                 apellidoMaternoAlumno: data.apellidoMaternoAlumno,
@@ -89,12 +98,15 @@ export const Tne = () => {
                                     fechaSello: data.ultimaTarjeta.fechaSello,
                                     folio: data.ultimaTarjeta.folio,
                                 }
-                            }
+                            },
+                            typeDocument,
+                            user,
+                            rut
                         });
                         ToastAndroid.show("TNE guardada correctamente", ToastAndroid.LONG);
-                        navigation.navigate('TypeDoc' as never);
+                        navigation.navigate('ListDocs' as never);
                     }).catch(error => {
-                        ToastAndroid.show("Error al buscar la TNE", ToastAndroid.LONG);
+                        ToastAndroid.show(error, ToastAndroid.LONG);
                     })
             }}>Continuar</Button>
         </View>

@@ -1,17 +1,23 @@
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import React from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Button, StyleSheet, Text,  View, } from 'react-native';
 import { imageComparison } from '@/utils/biometrics';
-import { Loading } from '@/components/loading';
+import { RegisterContext } from '@/context/register';
+import { AppContext } from '@/context/app';
+import { IconButton } from 'react-native-paper';
 export const Biometric = () => {
+  const { handleLogin, setBiometricScreen } = React.useContext(RegisterContext);
   const [permission, requestPermission] = useCameraPermissions();
   const [firstPicture, setFirstPicture] = React.useState<Base64URLString | null>(null);
   const cameraRef = React.useRef<CameraView>(null);
-  const [cameraSize, setCameraSize] = React.useState<ViewStyle>({
-    width: '50%',
-    height: '50%'
-  })
-  const [visible,setVisible] = React.useState<boolean>(false);
+  const { setLoading } = React.useContext(AppContext);
+
+  React.useEffect(() => {
+    setBiometricScreen(true);
+    return () => {
+      setBiometricScreen(false);
+    }
+  }, [])
   if (!permission) {
     // Camera permissions are still loading.
     return <View />;
@@ -28,47 +34,56 @@ export const Biometric = () => {
   }
 
   const takePicture = async () => {
+    let icon: LoadingIcon = 'Scan';
     if (cameraRef.current) {
-      setVisible(true)
+      setLoading({
+        loading: true,
+        icon: icon,
+        timeout: firstPicture ? undefined : 1500,
+      });
       const photo = await cameraRef.current.takePictureAsync({
         shutterSound: false,
         base64: true
+
       });
-      if (firstPicture) {
+      if (firstPicture && photo.base64) {
         try {
-          const result = await imageComparison({
-            image1Base64: firstPicture,
-            image2Base64: photo.base64
-          });
-          setVisible(false)
+          const result = await imageComparison(firstPicture, photo.base64);
           setFirstPicture(null)
-          alert(result.samePerson ? 'Same person' : 'Different persons');
+          if (result.samePerson) {
+            await handleLogin();
+            icon = 'Task complete tick';
+          } else {
+            icon = 'Failure error icon';
+            setFirstPicture(null)
+          }
         } catch (error) {
+          icon = 'Failure error icon';
           setFirstPicture(null)
-          console.log(error)
         }
-        return;
+      } else {
+        photo.base64 && setFirstPicture(photo.base64);
       }
-      photo.base64 && setFirstPicture(photo.base64);
-      setCameraSize({
-        width: '75%',
-        height: '75%'
-      })
-      setTimeout(()=>{setVisible(false)},1000)
+      setLoading({
+        loading: true,
+        icon: icon,
+        timeout: 1500,
+      });
     }
   }
 
   return (
     <View style={styles.container}>
-      <Loading visible={visible} />
       <CameraView style={{
-        ...cameraSize,
+        width: firstPicture ? '75%' : '50%',
+        height: firstPicture ? '75%' : '50%',
         borderRadius: 100
       }} facing={'front'} ref={cameraRef} />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={takePicture}>
-          <Text style={styles.text}>Take Picture</Text>
-        </TouchableOpacity>
+        <IconButton style={styles.button}
+          size={48}
+          onPress={takePicture}
+          icon="camera" />
       </View>
     </View>
   );
@@ -85,16 +100,18 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   buttonContainer: {
-    position: 'absolute',
-    bottom: 64,
     flexDirection: 'row',
-    backgroundColor: 'transparent',
-    width: '100%',
     paddingHorizontal: 64,
+
+    marginTop: 32,
+
+
   },
   button: {
+    borderRadius: 8,
     flex: 1,
     alignItems: 'center',
+
   },
   text: {
     fontSize: 24,
