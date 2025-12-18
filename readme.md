@@ -37,7 +37,7 @@
     npx expo start
     ```
 
-  - O tambien:
+- Tambien puedes usar:
 
     ```cmd
     npm start
